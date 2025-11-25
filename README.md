@@ -6,14 +6,14 @@ This project includes public and protected pages, CRUD operations, image uploadi
 ---
 
 ## 🚀 Live Demo
-- **Client Live Link:** _Add your Vercel link here_
-- **Server Live Link:** _Add your backend API link here_
+- **Client Live Link:** https://product-hub-client-next-js.vercel.app/
+- **Server Live Link:** product-hub-server-three.vercel.app
 
 ---
 
 ## 📂 Repositories
-- **Client Repository:** _Add GitHub repo link_
-- **Server Repository:** _Add GitHub repo link_
+- **Client Repository:** https://github.com/ArifBillahMubin/product-hub-client-next.js
+- **Server Repository:** [_Add GitHub repo link_](https://github.com/ArifBillahMubin/product-hub-server)
 
 ---
 
