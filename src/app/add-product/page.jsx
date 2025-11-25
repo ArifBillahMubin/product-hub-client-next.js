@@ -5,6 +5,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Swal from "sweetalert2";
 import { AuthContext } from "@/context/AuthContext";
 import { FiImage } from "react-icons/fi";
+import useAxios from "@/hooks/useAxios";
 
 export default function AddProductPage() {
     return (
@@ -15,7 +16,9 @@ export default function AddProductPage() {
 }
 
 function AddProductForm() {
+    const axiosPublic = useAxios();
     const { user } = useContext(AuthContext);
+
 
     const [preview, setPreview] = useState(null);
     const [photoFile, setPhotoFile] = useState(null);
@@ -28,7 +31,7 @@ function AddProductForm() {
         setPreview(URL.createObjectURL(file));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const form = e.target;
@@ -40,30 +43,45 @@ function AddProductForm() {
         const date = form.date.value;
         const priority = form.priority.value;
 
-        const productData = {
+        const newProduct = {
             title,
             shortDesc,
             fullDesc,
             price,
             date,
             priority,
-            image: preview || "No image",
+            image: preview || "",
             userEmail: user?.email,
             userName: user?.displayName,
+            createdAt: new Date(),
         };
 
-        console.log("Product Data:", productData);
+        try {
+            const res = await axiosPublic.post("/products", newProduct);
 
-        Swal.fire({
-            title: "Product Saved!",
-            text: "Form submitted successfully.",
-            icon: "success",
-            confirmButtonColor: "#000",
-        });
+            if (res.data.insertedId) {
+                Swal.fire({
+                    title: "Success!",
+                    text: "Product added successfully.",
+                    icon: "success",
+                    confirmButtonColor: "#000",
+                }).then(() => {
+                    router.push("/products");  
+                });;
 
-        form.reset();
-        setPreview(null);
-        setPhotoFile(null);
+                form.reset();
+                setPreview(null);
+                setPhotoFile(null);
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                title: "Error!",
+                text: "Failed to add product.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+            });
+        }
     };
 
     return (
@@ -181,6 +199,7 @@ function AddProductForm() {
 
                         <input
                             id="productImage"
+                            required
                             type="file"
                             accept="image/*"
                             className="hidden"
