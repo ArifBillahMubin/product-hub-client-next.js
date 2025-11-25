@@ -28,7 +28,8 @@ export default function LoginPage() {
                     icon: "success",
                     confirmButtonColor: "#000",
                 });
-                router.push("/");
+                const redirectPath = new URLSearchParams(window.location.search).get("redirect") || "/";
+                router.push(redirectPath);
             })
             .catch((err) => {
                 setError(err.message);
@@ -50,7 +51,8 @@ export default function LoginPage() {
                     icon: "success",
                     confirmButtonColor: "#000",
                 });
-                router.push("/");
+                const redirectPath = new URLSearchParams(window.location.search).get("redirect") || "/";
+                router.push(redirectPath);
             })
             .catch((err) => {
                 Swal.fire({

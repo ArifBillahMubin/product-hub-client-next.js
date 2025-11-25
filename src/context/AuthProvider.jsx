@@ -19,15 +19,22 @@ export default function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     // Register
-    const registerUser = (email, password) =>
-        createUserWithEmailAndPassword(auth, email, password);
+    const registerUser = (email, password) =>{
+        setLoading(true);
+        return createUserWithEmailAndPassword(auth, email, password);
+    }
 
     // Login
-    const signInUser = (email, password) =>
-        signInWithEmailAndPassword(auth, email, password);
+    const signInUser = (email, password) =>{
+        setLoading(true);
+        return signInWithEmailAndPassword(auth, email, password);
+    }
 
     // Google Login
-    const signInGoogle = () => signInWithPopup(auth, googleProvider);
+    const signInGoogle = () => {
+        setLoading(true);
+        return signInWithPopup(auth, googleProvider);
+    }
 
     // Logout
     const signOutUser = () => signOut(auth);
