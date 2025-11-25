@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import { AuthContext } from "@/context/AuthContext";
 import { FiImage } from "react-icons/fi";
 import useAxios from "@/hooks/useAxios";
+import { useRouter } from "next/navigation";
 
 export default function AddProductPage() {
     return (
@@ -17,8 +18,8 @@ export default function AddProductPage() {
 
 function AddProductForm() {
     const axiosPublic = useAxios();
+    const router = useRouter();
     const { user } = useContext(AuthContext);
-
 
     const [preview, setPreview] = useState(null);
     const [photoFile, setPhotoFile] = useState(null);
@@ -26,9 +27,21 @@ function AddProductForm() {
     const handlePhotoSelect = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         setPhotoFile(file);
         setPreview(URL.createObjectURL(file));
+    };
+
+    const uploadToImgBB = async (file) => {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const res = await fetch(
+            `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_KEY}`,
+            { method: "POST", body: formData }
+        );
+
+        const data = await res.json();
+        return data?.data?.url;
     };
 
     const handleSubmit = async (e) => {
@@ -43,6 +56,17 @@ function AddProductForm() {
         const date = form.date.value;
         const priority = form.priority.value;
 
+        if (!photoFile) {
+            return Swal.fire({
+                title: "Image Missing!",
+                text: "Please upload a product image.",
+                icon: "warning",
+                confirmButtonColor: "#000",
+            });
+        }
+
+        const imgURL = await uploadToImgBB(photoFile);
+
         const newProduct = {
             title,
             shortDesc,
@@ -50,7 +74,7 @@ function AddProductForm() {
             price,
             date,
             priority,
-            image: preview || "",
+            image: imgURL,
             userEmail: user?.email,
             userName: user?.displayName,
             createdAt: new Date(),
@@ -66,8 +90,8 @@ function AddProductForm() {
                     icon: "success",
                     confirmButtonColor: "#000",
                 }).then(() => {
-                    router.push("/products");  
-                });;
+                    router.push("/products");
+                });
 
                 form.reset();
                 setPreview(null);
@@ -97,7 +121,6 @@ function AddProductForm() {
                             alt="User"
                         />
                     </div>
-
                     <div>
                         <p className="font-semibold text-gray-900">{user?.displayName || "User"}</p>
                         <p className="text-sm text-gray-600">{user?.email}</p>
@@ -175,9 +198,10 @@ function AddProductForm() {
                                 <option value="high">High</option>
                             </select>
                         </div>
+
                     </div>
 
-                    {/* PRODUCT IMAGE UPLOAD (Modern UX) */}
+                    {/* IMAGE UPLOAD */}
                     <div className="flex flex-col items-center">
 
                         {!preview && (
@@ -190,7 +214,6 @@ function AddProductForm() {
                             </label>
                         )}
 
-                        {/* After Select → Show Preview */}
                         {preview && (
                             <div className="w-32 h-32 rounded-xl overflow-hidden shadow border">
                                 <img src={preview} className="w-full h-full object-cover" />
@@ -199,7 +222,6 @@ function AddProductForm() {
 
                         <input
                             id="productImage"
-                            required
                             type="file"
                             accept="image/*"
                             className="hidden"
@@ -207,7 +229,6 @@ function AddProductForm() {
                         />
                     </div>
 
-                    {/* Submit Button */}
                     <button
                         type="submit"
                         className="w-full py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-900 transition active:scale-95"
@@ -216,6 +237,7 @@ function AddProductForm() {
                     </button>
 
                 </form>
+
             </div>
         </div>
     );

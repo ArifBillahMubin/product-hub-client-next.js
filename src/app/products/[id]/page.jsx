@@ -4,13 +4,22 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import useAxios from "@/hooks/useAxios";
 import Link from "next/link";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function ProductDetailsPage() {
+export default function ProductDetailsWrapper() {
+    return (
+        <ProtectedRoute>
+            <ProductDetailsPage />
+        </ProtectedRoute>
+    );
+}
+
+function ProductDetailsPage() {
     const { id } = useParams();
     const axiosPublic = useAxios();
     const [product, setProduct] = useState(null);
 
-    // Fetch single product
+    // Fetch product
     useEffect(() => {
         if (id) {
             axiosPublic.get(`/products/${id}`).then((res) => {
@@ -43,6 +52,7 @@ export default function ProductDetailsPage() {
                 <img
                     src={product.image || "https://i.ibb.co/8mLqQ0T/profile.png"}
                     className="w-full h-full object-cover"
+                    alt={product.title}
                 />
             </div>
 
@@ -51,7 +61,7 @@ export default function ProductDetailsPage() {
                 {product.title}
             </h1>
 
-        
+            {/* META */}
             <div className="flex flex-wrap items-center gap-6 text-sm text-gray-700 mb-6">
                 <p><span className="font-semibold">Price:</span> ${product.price}</p>
                 <p><span className="font-semibold">Priority:</span> {product.priority}</p>
